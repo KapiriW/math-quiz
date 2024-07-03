@@ -6,6 +6,7 @@ questions_asked = 0
 correct_answers = 0
 attempts = 1
 attempts_allowed = 3
+quiz_history = []
 
 # Ensures that instructions can be read or not read
 def yes_no(question):
@@ -98,7 +99,7 @@ while questions_asked < num_questions:
         # Ask the user to respond to the question
         user_response = input(f"What is {quiz_first} + {quiz_second}? ")
         if user_response.lower() == "xxx":
-            questions_asked -= 1
+
             end_game = "yes"
             break
 
@@ -117,21 +118,29 @@ while questions_asked < num_questions:
         # Compare the user's response with the correct answer
         if user_response != correct_answer:
             if attempts_used < attempts_allowed:
-                feedback = f"Incorrect. Try again. You have {attempts_allowed - attempts_used} guesses left."
+                feedback = f"Incorrect.you answered {user_response} Try again. You have {attempts_allowed - attempts_used} guesses left."
             else:
-                feedback = "Sorry - you have no more guesses. You lose this round!"
+                feedback = f"Sorry - the answer was {correct_answer} you have no more guesses. You lose this round!"
         else:
-            feedback = f"Phew! You got it in {attempts_used} guesses."
+            feedback = f" You answered {correct_answer} which was right and got it in {attempts_used} guesses."
             correct_answers += 1
+
+
 
         # Print feedback to user
         print(feedback)
+
 
         # Warn user that they are running out of guesses
         if attempts_used == attempts_allowed - 1 and user_response != correct_answer:
             print("\nCareful - you have one response left!\n")
 
-    questions_asked += 1
+    if user_response != 'xxx':
+        questions_asked += 1
+        history_feedback = f"Round {questions_asked}: {feedback}"
+        quiz_history.append(history_feedback)
+
+
 
     # If in infinite mode and user chose to end game
     if mode == "infinite" and 'end_game' in locals():
@@ -140,9 +149,32 @@ while questions_asked < num_questions:
     #if it is regular and want to quit
     if mode == "regular" and 'end_game' in locals():
         break
+#if the user has Zero right answers show this to avoid division by zero
+if questions_asked == 0:
+    print("you exited on the first round ")
+    exit()
+if correct_answers == 0:
+    print(f"sorry you got 0 out of {questions_asked} question(s) "
+          f"which means you got  0% right sorry try again next time")
+    exit()
+
+else:
+    print("thank you for playing my math quiz ")
+    print(f"You answered {correct_answers} out of {questions_asked} questions correctly "
+          f"which is {correct_answers*100/questions_asked:.2f}%.")
+    if questions_asked == 0:
+        try:
+            user_response = int(user_response)
+        except ValueError:
+            print("Please enter a valid integer.")
+
 
 # Game loop ends here
 #shows statistics like how many you got right and your win percentage
-print("thank you for playing my math quiz ")
-print(f"You answered {correct_answers} out of {questions_asked} questions correctly."
-      f"which is {correct_answers*10/questions_asked*10:.2f}% correct ")
+
+
+
+see_history = yes_no("Do you want to see your game history? ")
+if see_history == "yes":
+    for item in quiz_history:
+        print(item)
